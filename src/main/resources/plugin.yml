@@ -1,23 +1,23 @@
-main: ru.azerusteam.sirmanager.Main
+main: com.azerusteam.sirmanager.SimpleLay
 name: SimpleLay
 version: 1.1.0
-author: Sirboys
+authors: [Sirboys, l_MrBoom_l]
 prefix: SimpleLay
 api-version: 1.13
 commands: 
   sit:
-    description: Sitting your self
+    description: 'Sit on any block!'
   lay:
-    description: Laying player
+    description: 'Lay anywhere in the world!'
 permissions:
   simplelay.*:
-    description: Gives access to all SimpleLay commands
+    description: 'Gives access to all SimpleLay commands'
     children:
       simplelay.sit: true
       simplelay.lay: true
   simplelay.sit:
-    description: Allows to sit in the World
+    description: 'Allows to sit in the world with /sit'
     default: true
   simplelay.lay:
-    description: Gives access to Lay command
+    description: 'Allows to lay in the world with /lay'
     default: true
