@@ -3,6 +3,7 @@ package com.azerusteam.players;
 import com.azerusteam.sirmanager.SimpleLay;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 
@@ -16,8 +17,6 @@ public class SitPlayer {
 	public SitPlayer(Player player) {
 		this.plugin = SimpleLay.getInstance();
 		this.player = player;
-
-       //this.plugin.setLay(player.getUniqueId(),entityPlayer.getId(), seat);
 	}
 
 	public void setSit(ArmorStand armorStand, boolean onStairs, Location was, boolean announceToPlayer) {
@@ -37,12 +36,17 @@ public class SitPlayer {
 		}
 		if (fixLocation || this.player.isDead())
 			return;
-		Bukkit.getScheduler().runTaskLater(this.plugin, () -> this.player.teleport(this.armorStand.getLocation().add(0.0, this.onStairs ? 0.7 : 0.2, 0.0).setDirection(this.player.getLocation().getDirection())), 1L);
+		Bukkit.getScheduler().runTaskLater(this.plugin, () ->
+				this.player.teleport(this.armorStand.getLocation().add(0.0, this.onStairs ? 0.7 + 1.5 : 0.2 + 1.5, 0.0).setDirection(this.player.getLocation().getDirection())), 1L);
 	}
 	public static void checkSeatBlock() {
 		for (SitPlayer sitPlayer : SimpleLay.getInstance().getSittingPlayers().values()) {
-			if (sitPlayer != null && !sitPlayer.armorStand.getLocation().getBlock().isEmpty()) {
-				sitPlayer.unSit(false);
+			if (sitPlayer != null) {
+				Block block = sitPlayer.armorStand.getLocation().clone()
+						.add(0, 1.69, 0).getBlock();
+				if (block.isEmpty() || block.isLiquid()) {
+					sitPlayer.unSit(false);
+				}
 			}
 		}
 	}

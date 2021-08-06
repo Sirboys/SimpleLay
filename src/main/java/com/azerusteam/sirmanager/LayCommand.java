@@ -5,9 +5,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import com.azerusteam.players.SirPlayer;
+import org.jetbrains.annotations.NotNull;
 
 public class LayCommand implements CommandExecutor {
 	private final SimpleLay plugin;
@@ -15,7 +15,7 @@ public class LayCommand implements CommandExecutor {
 		this.plugin = SimpleLay.getInstance();
 	}
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String string, String[] args) {
+	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String string, String[] args) {
 		if (!(sender instanceof Player)){
 			sender.sendMessage("This command is for players only!");
 			return false;
@@ -29,7 +29,7 @@ public class LayCommand implements CommandExecutor {
 				sp.getPlayer().sendMessage(plugin.prefix + plugin.getConfig().getString("lang.sit.now"));
 				return false;
 			} else if (!sp.getPlayer().isOnGround() || sp.getPlayer().getLocation().subtract(0, 0.2, 0).getBlock().getType() == Material.AIR) {
-				sp.getPlayer().sendMessage(plugin.prefix+plugin.getConfig().getString("lang.lay.notOnGround"));
+				sp.getPlayer().sendMessage(plugin.prefix + plugin.getConfig().getString("lang.lay.notOnGround"));
 				return false;
 			} 
 			sp.setLay();

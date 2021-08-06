@@ -9,7 +9,7 @@ import java.util.List;
 
 public class PacketPlayOutEntityEquipment extends Packet {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("PacketPlayOutEntityEquipment");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("PacketPlayOutEntityEquipment", "net.minecraft.network.protocol.game");
 
     public PacketPlayOutEntityEquipment(int id, List<Pair<EnumItemSlot, ItemStack>> slots) { // 1.16+
         List<Pair<?, ?>> slots1 = new ArrayList<>();

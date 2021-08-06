@@ -14,9 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.NumberConversions;
 
-import java.util.Collections;
-import java.util.Optional;
-
 public class LayPlayer_v1_16_R1 implements ILayPlayer {
 	private int fakePlayerID;
 	private ArmorStand rider;
@@ -47,6 +44,9 @@ public class LayPlayer_v1_16_R1 implements ILayPlayer {
 
 		Location loc = player.getLocation();
 		this.fakePlayer.setPositionRotation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), player.getEyeLocation().getPitch());
+		//fixme use tab list name
+		//IChatBaseComponent playerListName = entityPlayer.getPlayerListNameAsChatComponent();
+		//this.fakePlayer.setListName(playerListName);
 
 		this.rotation = player.getLocation().getYaw();
 		BlockData bedBlockData = this.bedBlockData();
@@ -58,24 +58,18 @@ public class LayPlayer_v1_16_R1 implements ILayPlayer {
 		Location bukkitBedLocation = new Location(player.getWorld(), player.getLocation().getX(), 0, player.getLocation().getZ());
 		BlockPosition nmsBedLocation = new BlockPosition(bukkitBedLocation);
 		Packet entityDestroy = new PacketPlayOutEntityDestroy(id);
-
-		ScoreboardTeam team = new ScoreboardTeam(minecraftServer.getScoreboard(), "SimpleLay_TEAM")
-				.setNameTagVisibility(ScoreboardTeam.EnumNameTagVisibility.NEVER);
-		Packet scoreboardTeam1 = new PacketPlayOutScoreboardTeam(team, 0), scoreboardTeam2 = new PacketPlayOutScoreboardTeam(team, Collections.singletonList(player.getName()), 3);
-
-        try {
-			this.fakePlayer.setPose(EntityPose.SLEEPING);
+		//FIXME scoreboards
+		this.fakePlayer.setPose(EntityPose.SLEEPING);
+		this.fakePlayer.setBedPosition(nmsBedLocation);
+		try {
 			DataWatcher watcher = entityPlayer.getDataWatcher(), fakeWatcher = this.fakePlayer.getDataWatcher();
 		    fakeWatcher.set(DataWatcherRegistry.BYTE.createAccessor(16), watcher.get(DataWatcherRegistry.BYTE.createAccessor(16)));
-	        fakeWatcher.set(EntityLiving.SLEEPING_POS_ID, Optional.of(nmsBedLocation));
-			Packet entityMetadata = new PacketPlayOutEntityMetadata(this.fakePlayerID, fakeWatcher, false);
+	        Packet entityMetadata = new PacketPlayOutEntityMetadata(this.fakePlayerID, fakeWatcher, false);
 			player.hidePlayer(plugin, player);
 			for (Player onlinePlayer : player.getServer().getOnlinePlayers()) {
 				EntityPlayer entityPlayer1 = CraftPlayer.wrap(onlinePlayer).getHandle();
 				PlayerConnection playerConnection = entityPlayer1.getPlayerConnection();
-				if (!entityPlayer1.equals(entityPlayer)) {
-					playerConnection.sendPacket(playerInfo);
-				}
+				playerConnection.sendPacket(playerInfo);
 				if (entityPlayer1.equals(entityPlayer)) {
 					playerConnection.sendPacket(new PacketPlayOutEntityEffect(id, new MobEffect(MobEffects.INVISIBILITY, 25122001, 0, false, false)));
 					entityPlayer1.setInvisible(true);
@@ -85,13 +79,10 @@ public class LayPlayer_v1_16_R1 implements ILayPlayer {
 				playerConnection.sendPacket(relMoveLook);
 				if (!entityPlayer1.equals(entityPlayer))
 					playerConnection.sendPacket(entityDestroy);
-				else
-					playerConnection.sendPacket(scoreboardTeam1, scoreboardTeam2);
 			}
         } catch (Exception e) {
         	e.printStackTrace();
         }
-        //player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 25122001, 244, true));
         final Location location = player.getLocation();
         this.rider = location.getWorld().spawn(location.clone().subtract(0, 1.7, 0), ArmorStand.class);
         this.rider.setGravity(false);
@@ -106,10 +97,10 @@ public class LayPlayer_v1_16_R1 implements ILayPlayer {
 		Packet namedEntitySpawn = new PacketPlayOutNamedEntitySpawn(entityPlayer);
 		Packet playerInfo = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer);
 		DataWatcher watcher = entityPlayer.getDataWatcher();
-	    watcher.set(DataWatcherRegistry.BYTE.createAccessor(16), watcher.get(DataWatcherRegistry.BYTE.createAccessor(16)));
+	    watcher.set(DataWatcherRegistry.BYTE.createAccessor(17), watcher.get(DataWatcherRegistry.BYTE.createAccessor(17)));
 		Packet entityMetadata = new PacketPlayOutEntityMetadata(entityPlayer.getId(), watcher, true);
 		Packet entityHeadRotation = new PacketPlayOutEntityHeadRotation(entityPlayer, (byte) NumberConversions.floor(entityPlayer.getHeadRotation() * 256.0F / 360.0F));
-		Packet equipmentPacket = ILayPlayer.getEquipmentPacket(player);
+		Packet equipmentPacket = ILayPlayer.getEquipmentPacket(player, fakePlayerID); //fixme fakeid is 0
 		MobEffect ppl = entityPlayer.getEffect(MobEffects.INVISIBILITY);
 		this.player.showPlayer(plugin, player);
 		entityPlayer.getPlayerConnection().sendPacket(new PacketPlayOutRemoveEntityEffect(entityPlayer.getId(), MobEffects.INVISIBILITY));
@@ -167,7 +158,6 @@ public class LayPlayer_v1_16_R1 implements ILayPlayer {
 	}
 
 	public static void checkSeatBlock(SimpleLay plugin) { // not unused; used using reflection
-		//Collection<LayPlayer> spList = plugin.getLays().values();
 		for (ILayPlayer iLayPlayer : plugin.getLayingPlayers().values()) {
 			if (iLayPlayer == null) continue;
 			if (iLayPlayer.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
@@ -184,7 +174,7 @@ public class LayPlayer_v1_16_R1 implements ILayPlayer {
 		plugin.getServer().getOnlinePlayers().stream().map(CraftPlayer::wrap).map(CraftPlayer::getHandle).forEach(entityPlayer -> plugin.getLayingPlayers().values().forEach(iLayPlayer -> {
 			EntityPlayer p = CraftPlayer.wrap(iLayPlayer.getPlayer()).getHandle();
 			PlayerConnection playerConnection = entityPlayer.getPlayerConnection();
-			playerConnection.sendPacket(ILayPlayer.getEquipmentPacket(p));
+			playerConnection.sendPacket(ILayPlayer.getEquipmentPacket(p, iLayPlayer.getFakePlayerID()));
 			Location loc = iLayPlayer.getPlayer().getLocation();
 			loc.setY(0);
 			entityPlayer.getBukkitEntity().sendBlockChange(loc, iLayPlayer.bedBlockData());

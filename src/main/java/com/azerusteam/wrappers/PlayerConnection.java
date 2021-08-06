@@ -4,7 +4,7 @@ import com.comphenix.tinyprotocol.Reflection;
 
 public class PlayerConnection extends AbstractWrapper {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("PlayerConnection");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("PlayerConnection", "net.minecraft.server.network");
 
     protected final Object instance;
 

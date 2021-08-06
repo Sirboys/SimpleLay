@@ -6,7 +6,7 @@ import java.util.Collection;
 
 public class PacketPlayOutScoreboardTeam extends Packet {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("PacketPlayOutNamedEntitySpawn");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("PacketPlayOutScoreboardTeam", "net.minecraft.network.protocol.game");
 
     public PacketPlayOutScoreboardTeam(ScoreboardTeam team, int mode) {
         instance = getConstructor(ScoreboardTeam.clazz, int.class).invoke(team.instance, mode);

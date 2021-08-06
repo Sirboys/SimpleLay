@@ -4,10 +4,10 @@ import com.comphenix.tinyprotocol.Reflection;
 
 public class PacketPlayOutNamedEntitySpawn extends Packet {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("PacketPlayOutNamedEntitySpawn");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("PacketPlayOutNamedEntitySpawn", "net.minecraft.network.protocol.game");
 
-    public PacketPlayOutNamedEntitySpawn(EntityPlayer entityPlayer) {
-        instance = getConstructor(EntityPlayer.clazz).invoke(entityPlayer);
+    public PacketPlayOutNamedEntitySpawn(EntityHuman entityHuman) {
+        instance = getConstructor(EntityHuman.clazz).invoke(entityHuman.instance);
     }
 
     private PacketPlayOutNamedEntitySpawn(Object handle) {

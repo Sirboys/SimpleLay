@@ -4,7 +4,7 @@ import com.comphenix.tinyprotocol.Reflection;
 
 public class PacketPlayOutEntityMetadata extends Packet {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("PacketPlayOutEntityMetadata");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("PacketPlayOutEntityMetadata", "net.minecraft.network.protocol.game");
 
     public PacketPlayOutEntityMetadata(int id, DataWatcher data, boolean forceUpdateAll) {
         instance = getConstructor(int.class, DataWatcher.clazz, boolean.class).invoke(id, data.instance, forceUpdateAll);

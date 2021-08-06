@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class ItemStack extends AbstractWrapper {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("ItemStack");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("ItemStack", "net.minecraft.world.item");
     Object instance;
 
     private ItemStack(Object handle) {

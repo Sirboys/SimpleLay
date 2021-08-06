@@ -6,6 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class SitCommand implements CommandExecutor{
 	private final SimpleLay plugin;
@@ -13,16 +14,13 @@ public class SitCommand implements CommandExecutor{
 		this.plugin = SimpleLay.getInstance();
 	}
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String string, String[] args) {
+	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String string, String[] args) {
 		if (!(sender instanceof Player)){
 			sender.sendMessage("This command only for players!");
 			return true;
 		}
-
 		SirPlayer sp = new SirPlayer((Player) sender);
-
 		if (sp.isSitting()) {
-			//sp.pl.sendMessage(sp.pl.toString());
 			sp.walk();
 		} else {
 			if(sp.isLay()) {

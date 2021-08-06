@@ -4,7 +4,7 @@ import com.comphenix.tinyprotocol.Reflection;
 
 public class PacketPlayOutEntityHeadRotation extends Packet {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("PacketPlayOutEntityHeadRotation");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("PacketPlayOutEntityHeadRotation", "net.minecraft.network.protocol.game");
 
     public PacketPlayOutEntityHeadRotation(Entity entity, byte angle) {
         instance = getConstructor(Entity.clazz, byte.class).invoke(entity.instance, angle);

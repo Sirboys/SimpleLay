@@ -4,12 +4,19 @@ import com.comphenix.tinyprotocol.Reflection;
 
 public class PlayerInteractManager extends AbstractWrapper {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("PlayerInteractManager");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("PlayerInteractManager", "net.minecraft.server.level");
 
-    protected final Object instance;
+    protected Object instance;
 
+    public PlayerInteractManager(World world) {
+        instance = getConstructor(World.clazz).invoke(world.instance);
+    }
     public PlayerInteractManager(WorldServer worldServer) {
-        instance = getConstructor(WorldServer.clazz).invoke(worldServer.instance);
+        try {
+            instance = getConstructor(WorldServer.clazz).invoke(worldServer.instance);
+        } catch (Exception e) {
+            instance = getConstructor(World.clazz).invoke(worldServer.instance);
+        }
     }
 
     private PlayerInteractManager(Object handle) {

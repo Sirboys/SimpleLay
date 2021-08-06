@@ -12,6 +12,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -42,32 +43,35 @@ public interface ILayPlayer {
 		return null;
 	}
 
-	static Packet[] getEquipmentPackets(EntityPlayer entityPlayer) { // 1.13-1.15.2
-		return getEquipmentPackets(entityPlayer.getBukkitEntity());
+	static Packet[] getEquipmentPackets(EntityPlayer entityPlayer, int fakePlayerId) { // 1.13-1.15.2
+		return getEquipmentPackets(entityPlayer.getBukkitEntity(), fakePlayerId);
 	}
 
-	static Packet[] getEquipmentPackets(Player player) { // 1.13-1.15.2
-		ItemStack helmet = player.getEquipment().getHelmet();
-		ItemStack chestplate = player.getEquipment().getChestplate();
-		ItemStack leggings = player.getEquipment().getLeggings();
-		ItemStack boots = player.getEquipment().getBoots();
-		ItemStack mainHand = player.getEquipment().getItemInMainHand();
-		ItemStack offHand = player.getEquipment().getItemInOffHand();
+	static Packet[] getEquipmentPackets(Player player, int fakePlayerId) { // 1.13-1.15.2
+
+		EntityEquipment equipment = player.getEquipment();
+		if (equipment == null) return new Packet[0];
+		ItemStack helmet = equipment.getHelmet();
+		ItemStack chestplate = equipment.getChestplate();
+		ItemStack leggings = equipment.getLeggings();
+		ItemStack boots = equipment.getBoots();
+		ItemStack mainHand = equipment.getItemInMainHand();
+		ItemStack offHand = equipment.getItemInOffHand();
 		ArrayList<Packet> packets = new ArrayList<>();
-		if (helmet != null) packets.add(new PacketPlayOutEntityEquipment(player.getEntityId(), EnumItemSlot.HEAD, helmet));
-		if (chestplate != null) packets.add(new PacketPlayOutEntityEquipment(player.getEntityId(), EnumItemSlot.CHEST, chestplate));
-		if (leggings != null) packets.add(new PacketPlayOutEntityEquipment(player.getEntityId(), EnumItemSlot.LEGS, leggings));
-		if (boots != null) packets.add(new PacketPlayOutEntityEquipment(player.getEntityId(), EnumItemSlot.FEET, boots));
-		if (mainHand != null) packets.add(new PacketPlayOutEntityEquipment(player.getEntityId(), EnumItemSlot.MAINHAND, mainHand));
-		if (offHand != null) packets.add(new PacketPlayOutEntityEquipment(player.getEntityId(), EnumItemSlot.OFFHAND, offHand));
+		if (helmet != null) packets.add(new PacketPlayOutEntityEquipment(fakePlayerId, EnumItemSlot.HEAD, helmet));
+		if (chestplate != null) packets.add(new PacketPlayOutEntityEquipment(fakePlayerId, EnumItemSlot.CHEST, chestplate));
+		if (leggings != null) packets.add(new PacketPlayOutEntityEquipment(fakePlayerId, EnumItemSlot.LEGS, leggings));
+		if (boots != null) packets.add(new PacketPlayOutEntityEquipment(fakePlayerId, EnumItemSlot.FEET, boots));
+		if (mainHand != null) packets.add(new PacketPlayOutEntityEquipment(fakePlayerId, EnumItemSlot.MAINHAND, mainHand));
+		if (offHand != null) packets.add(new PacketPlayOutEntityEquipment(fakePlayerId, EnumItemSlot.OFFHAND, offHand));
 		return packets.toArray(new Packet[0]);
 	}
 
-	static Packet getEquipmentPacket(EntityPlayer entityPlayer) { // 1.16+
-		return getEquipmentPacket(entityPlayer.getBukkitEntity());
+	static Packet getEquipmentPacket(EntityPlayer entityPlayer, int fakePlayerId) { // 1.16+
+		return getEquipmentPacket(entityPlayer.getBukkitEntity(), fakePlayerId);
 	}
 
-	static Packet getEquipmentPacket(Player player) { // 1.16+
+	static Packet getEquipmentPacket(Player player, int fakePlayerId) { // 1.16+
 		ArrayList<Pair<EnumItemSlot, ItemStack>> slots = new ArrayList<>();
 		slots.add(new Pair<>(EnumItemSlot.HEAD, player.getEquipment().getHelmet()));
 		slots.add(new Pair<>(EnumItemSlot.CHEST, player.getEquipment().getChestplate()));
@@ -75,7 +79,7 @@ public interface ILayPlayer {
 		slots.add(new Pair<>(EnumItemSlot.FEET, player.getEquipment().getBoots()));
 		slots.add(new Pair<>(EnumItemSlot.MAINHAND, player.getEquipment().getItemInMainHand()));
 		slots.add(new Pair<>(EnumItemSlot.OFFHAND, player.getEquipment().getItemInOffHand()));
-		return new PacketPlayOutEntityEquipment(player.getEntityId(), slots);
+		return new PacketPlayOutEntityEquipment(fakePlayerId, slots);
 	}
 
 }

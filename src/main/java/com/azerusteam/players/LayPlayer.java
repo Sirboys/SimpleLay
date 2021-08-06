@@ -31,31 +31,28 @@ public class LayPlayer {
 
 	private static Class<? extends ILayPlayer> getLayPlayerClass() {
 		Class<? extends ILayPlayer> clazz;
-		String bukkitVersion = Bukkit.getBukkitVersion();
-		if (bukkitVersion.equals("1.17-R0.1-SNAPSHOT")) {
-			clazz = LayPlayer_v1_17_R1.class;
-		} else {
-			switch (Bukkit.getServer().getClass().getPackage().getName().substring(23)) {
-				case "v1_16_R3":
-					clazz = LayPlayer_v1_16_R3.class;
-					break;
-				case "v1_16_R2":
-					clazz = LayPlayer_v1_16_R2.class;
-					break;
-				case "v1_16_R1":
-					clazz = LayPlayer_v1_16_R1.class;
-					break;
-				case "v1_15_R1":
-				case "v1_14_R1":
-					clazz = LayPlayer_v1_14_R1.class;
-					break;
-				case "v1_13_R2":
-				case "v1_13_R1":
-					clazz = LayPlayer_v1_13_R1.class;
-					break;
-				default:
-					throw new UnsupportedOperationException("Unsupported server version (" + bukkitVersion + ")");
-			}
+		String version = Bukkit.getServer().getClass().getPackage().getName().substring(23);
+		switch (version) {
+			case "v1_17_R2":
+			case "v1_17_R1":
+				clazz = LayPlayer_v1_17_R1.class;
+				break;
+			case "v1_16_R3":
+			case "v1_16_R2":
+			case "v1_16_R1":
+				clazz = LayPlayer_v1_16_R1.class;
+				break;
+			case "v1_15_R1":
+			case "v1_14_R1":
+				clazz = LayPlayer_v1_14_R1.class;
+				break;
+			case "v1_13_R2":
+			case "v1_13_R1":
+				clazz = LayPlayer_v1_13_R1.class;
+				break;
+			default:
+				SimpleLay.getInstance().getPluginLoader().disablePlugin(SimpleLay.getInstance());
+				throw new UnsupportedOperationException("Unsupported server version (" + version + ")");
 		}
 		return clazz;
 	}

@@ -19,23 +19,17 @@ public class SirPlayer {
 			this.player.sendMessage(this.plugin.prefix + this.plugin.getConfig().getString("lang.no-permissions"));
 			return;
 		}
-		final Location location = this.player.getLocation();
-		final World world = location.getWorld();
+		final World world = loc.getWorld();
 		if (world == null) {
 			this.plugin.getLogger().warning("SirPlayer#setSit(...) is called, however player location's world is null");
 			return;
 		}
-		final ArmorStand seat = world.spawn(loc.subtract(0.0, 0.2, 0.0), ArmorStand.class, b -> {
-			b.setGravity(false);
-            b.setMarker(true);
-            b.setSmall(true);
-            b.setVisible(false);
-            b.addPassenger(this.player);
-            b.setCollidable(false);
-	        b.addScoreboardTag("simpleLay");
-		});
+		final ArmorStand seat = (ArmorStand) loc.getWorld().spawn(loc.clone().subtract(0, 1.7, 0), ArmorStand.class);
+		seat.setGravity(false);
+		seat.setVisible(false);
+		seat.addPassenger(player);
         SitPlayer sitPlayer = new SitPlayer(this.player);
-        sitPlayer.setSit(seat, stairs, location, announceToPlayer);
+        sitPlayer.setSit(seat, stairs, loc, announceToPlayer);
         if (announceToPlayer) {
         	this.player.sendMessage(this.plugin.prefix + plugin.getConfig().getString("lang.sit.now"));
         }
@@ -70,9 +64,7 @@ public class SirPlayer {
 			return;
 		}
 		lp.lay();
-		//this.pl.removePotionEffect(PotionEffectType.INVISIBILITY);
-        //this.pl.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 25122001, 244, true));
-        if (plugin.getConfig().getBoolean("lay.announce.command")) {
+		if (plugin.getConfig().getBoolean("lay.announce.command")) {
         	this.player.sendMessage(plugin.prefix+plugin.getConfig().getString("lang.lay.now"));
         }
 	}

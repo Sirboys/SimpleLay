@@ -5,7 +5,7 @@ import org.bukkit.Location;
 
 public class BlockPosition extends AbstractWrapper {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("BlockPosition");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("BlockPosition", "net.minecraft.core");
 
     protected final Object instance;
 

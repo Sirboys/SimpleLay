@@ -4,11 +4,11 @@ import com.comphenix.tinyprotocol.Reflection;
 
 public class PacketPlayOutEntityDestroy extends Packet {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("PacketPlayOutEntityDestroy");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("PacketPlayOutEntityDestroy", "net.minecraft.network.protocol.game");
 
     public PacketPlayOutEntityDestroy(int... ids) {
         try {
-            instance = getConstructor(int[].class).invoke((Object) ids); // <-- not actually a redundant cast
+            instance = getConstructor(int[].class).invoke(ids); // <-- not actually a redundant cast
         } catch (Exception ex) {
             instance = getConstructor(int.class).invoke(ids[0]);
         }

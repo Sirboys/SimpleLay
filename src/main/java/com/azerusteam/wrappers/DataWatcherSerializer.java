@@ -4,7 +4,7 @@ import com.comphenix.tinyprotocol.Reflection;
 
 public class DataWatcherSerializer<T> extends AbstractWrapper {
 
-	public static final Class<?> clazz = Reflection.getMinecraftClass("DataWatcherSerializer");
+	public static final Class<?> clazz = Reflection.getMinecraftClass("DataWatcherSerializer", "net.minecraft.network.syncher");
 	protected final Object instance;
 
 	private DataWatcherSerializer(Object handle) {

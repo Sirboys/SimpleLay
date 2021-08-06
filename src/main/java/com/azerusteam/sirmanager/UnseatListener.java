@@ -3,6 +3,7 @@ package com.azerusteam.sirmanager;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import com.azerusteam.players.SirPlayer;
 import com.azerusteam.players.SitPlayer;
@@ -24,6 +25,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -34,14 +36,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.azerusteam.players.LayPlayer;
 
 public class UnseatListener implements Listener{
-	private SimpleLay plugin;
+	private final SimpleLay plugin;
 	public UnseatListener() {
 		this.plugin = (SimpleLay) JavaPlugin.getPlugin(SimpleLay.class);
 	}
 	@EventHandler
-    public void onPlayerTeleport(final PlayerTeleportEvent e) {
-		//if (!(e.getEntity() instanceof Player)) return;
-		
+    public void on(final PlayerTeleportEvent e) {
         final SirPlayer player = new SirPlayer((Player) e.getPlayer());
         if (player.isSitting()) {
         	player.walk();
@@ -50,9 +50,8 @@ public class UnseatListener implements Listener{
         	player.unLay();
         }
     }
-	
 	@EventHandler
-	public void onLeave(final PlayerQuitEvent e) {
+	public void on(final PlayerQuitEvent e) {
 		SirPlayer player = new SirPlayer(e.getPlayer());
         if (player.isSitting()) {
         	player.walk();
@@ -62,18 +61,27 @@ public class UnseatListener implements Listener{
         	
         }
 	}
+	@EventHandler
+	public void on(final PlayerDeathEvent e) {
+		SirPlayer player = new SirPlayer(e.getEntity().getPlayer());
+		if (player.isLay()) {
+			player.unLay();
+		}
+		if (player.isSitting()) {
+			player.walk();
+		}
+	}
 	@EventHandler(priority = EventPriority.LOW)
-	public void onDamage(final EntityDamageByEntityEvent e) {
+	public void on(final EntityDamageByEntityEvent e) {
 		Entity entity = e.getEntity();
 		if (e.getDamager() instanceof Player && entity instanceof ArmorStand) {
 			ArmorStand as = (ArmorStand) entity;
 			List<Entity> riders = as.getPassengers();
-			if (riders == null || riders.size() == 0) return;
+			if (riders.size() == 0) return;
 			Entity rider = riders.get(0);
 			if (rider instanceof Player) {
 				SirPlayer sp = new SirPlayer((Player) rider);
 				if (!sp.isLay()) return;
-				//rider.sendMessage("Taked damage!");
 				if (!(((Player) rider).getGameMode() == GameMode.ADVENTURE || ((Player) rider).getGameMode() == GameMode.SURVIVAL)) return;
 				((Player) rider).damage(e.getFinalDamage());
 				plugin.getLayingPlayers().get(rider.getUniqueId()).unLay(plugin.getConfig().getBoolean("lay.announce.command"));
@@ -87,6 +95,13 @@ public class UnseatListener implements Listener{
 	}
 	@EventHandler
 	public void onRespawn(final PlayerRespawnEvent e) {
+		SirPlayer player = new SirPlayer(e.getPlayer());
+		if (player.isSitting()) {
+			player.walk();
+		}
+		if (player.isLay()) {
+			player.unLay();
+		}
 		plugin.getServer().getScheduler().runTaskLater(plugin, () -> LayPlayer.showLayingPlayers(plugin, e.getPlayer()), 10L);
 	}
 	@EventHandler
@@ -96,14 +111,13 @@ public class UnseatListener implements Listener{
 		if (e.getBlockFace() != BlockFace.UP) return;
 		if (e.useInteractedBlock() == Result.DENY && e.useItemInHand() == Result.DENY) return;
 		if (!(e.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR)) return;
-		if (e.getClickedBlock().getLocation().add(0, 1, 0).getBlock().getType() != Material.AIR) return;
+		if (Objects.requireNonNull(e.getClickedBlock()).getLocation().add(0, 1, 0).getBlock().getType() != Material.AIR) return;
 		if (e.getPlayer().isSneaking()) return;
 		if (e.getPlayer().getLocation().getPitch() < plugin.getConfig().getDouble("sit.pitch-limit")) return;
 		if (e.getPlayer().getLocation().distance(e.getClickedBlock().getLocation()) > plugin.getConfig().getDouble("sit.click-distance")) return;
 		boolean obstracted = false;
 		Collection<SitPlayer> sPlayers = plugin.getSittingPlayers().values();
-		for (Iterator<SitPlayer> iterator = sPlayers.iterator(); iterator.hasNext();) {
-			SitPlayer sitPlayer = (SitPlayer) iterator.next();
+		for (SitPlayer sitPlayer : sPlayers) {
 			if (sitPlayer.player.getUniqueId() == e.getPlayer().getUniqueId()) {
 				continue;
 			}
@@ -138,47 +152,32 @@ public class UnseatListener implements Listener{
 					loc.setPitch(e.getPlayer().getLocation().getPitch());
 					loc.setYaw(e.getPlayer().getLocation().getYaw());
 					Stairs st = (Stairs) e.getClickedBlock().getBlockData();
-					//e.getPlayer().teleport(loc);
 					if ((st.getShape() == Shape.STRAIGHT) && (st.getFacing() == BlockFace.EAST)) {
 						loc.setYaw(90);
-						//e.getPlayer().teleport(loc.add(-0.2,0,0));
 						loc.add(-0.2,0,0);
 					}else if ((st.getShape() == Shape.STRAIGHT) && (st.getFacing() == BlockFace.WEST)) {
 						loc.setYaw(-90);
-						//e.getPlayer().teleport(loc.add(0.2,0,0));
 						loc.add(0.2,0,0);
 					}else if ((st.getShape() == Shape.STRAIGHT) && (st.getFacing() == BlockFace.SOUTH)){
 						loc.setYaw(180);
-						//e.getPlayer().teleport(loc.add(0,0,-0.2));
 						loc.add(0,0,-0.2);
 					}else if ((st.getShape() == Shape.STRAIGHT) && (st.getFacing() == BlockFace.NORTH)) {
 						loc.setYaw(0);
-						//e.getPlayer().teleport(loc.add(0,0,0.2));	
 						loc.add(0,0,0.2);
 					}else if ((st.getFacing() == BlockFace.NORTH && st.getShape() == Shape.OUTER_RIGHT) || (st.getFacing() == BlockFace.EAST && st.getShape() == Stairs.Shape.OUTER_LEFT) || (st.getFacing() == BlockFace.NORTH && st.getShape() == Stairs.Shape.INNER_RIGHT) || (st.getFacing() == BlockFace.EAST && st.getShape() == Stairs.Shape.INNER_LEFT)) {
-                        //spawnSeat(b.getLocation(), p, 0.13, 0.5, -0.13, -135.0f, b.getLocation());
-						loc.setYaw(45);
-						//e.getPlayer().teleport(loc.add(-0.2,0,0.2));
+                        loc.setYaw(45);
 						loc.add(-0.2,0,0.2);
                     }
                     else if ((st.getFacing() == BlockFace.NORTH && st.getShape() == Stairs.Shape.OUTER_LEFT) || (st.getFacing() == BlockFace.WEST && st.getShape() == Stairs.Shape.OUTER_RIGHT) || (st.getFacing() == BlockFace.NORTH && st.getShape() == Stairs.Shape.INNER_LEFT) || (st.getFacing() == BlockFace.WEST && st.getShape() == Stairs.Shape.INNER_RIGHT)) {
-                        //spawnSeat(b.getLocation(), p, -0.13, 0.5, -0.13, 135.0f, b.getLocation());
-                    	loc.setYaw(-45);
-                    	//e.getPlayer().teleport(loc.add(0.2,0,0.2));
+                        loc.setYaw(-45);
                     	loc.add(0.2,0,0.2);
                     }
                     else if ((st.getFacing() == BlockFace.SOUTH && st.getShape() == Stairs.Shape.OUTER_RIGHT) || (st.getFacing() == BlockFace.WEST && st.getShape()  == Stairs.Shape.OUTER_LEFT) || (st.getFacing() == BlockFace.SOUTH && st.getShape() == Stairs.Shape.INNER_RIGHT) || (st.getFacing() == BlockFace.WEST && st.getShape() == Stairs.Shape.INNER_LEFT)) {
-                        //spawnSeat(b.getLocation(), p, -0.13, 0.5, 0.13, 45.0f, b.getLocation());
-                    	
-                    	loc.setYaw(-135);
-                    	//e.getPlayer().teleport(loc.add(0.2,0,-0.2));
+                        loc.setYaw(-135);
                     	loc.add(0.2,0,-0.2);
                     }
                     else if ((st.getFacing() == BlockFace.SOUTH && st.getShape() == Stairs.Shape.OUTER_LEFT) || (st.getFacing() == BlockFace.EAST && st.getShape()  == Stairs.Shape.OUTER_RIGHT) || (st.getFacing() == BlockFace.SOUTH && st.getShape() == Stairs.Shape.INNER_LEFT) || (st.getFacing() == BlockFace.EAST && st.getShape() == Stairs.Shape.INNER_RIGHT)) {
-                        //spawnSeat(b.getLocation(), p, 0.13, 0.5, 0.13, -45.0f, b.getLocation());
-                    	
-                    	loc.setYaw(135);
-                    	//e.getPlayer().teleport(loc.add(-0.2,0,-0.2));
+                        loc.setYaw(135);
                     	loc.add(-0.2,0,-0.2);
                     }
 					sp.setSit(true,loc,plugin.getConfig().getBoolean("sit.announce.click"));

@@ -15,7 +15,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.NumberConversions;
 
 import java.util.Collections;
-import java.util.Optional;
 
 public class LayPlayer_v1_14_R1 implements ILayPlayer {
 	private int fakePlayerID;
@@ -59,20 +58,19 @@ public class LayPlayer_v1_14_R1 implements ILayPlayer {
 		BlockPosition nmsBedLocation = new BlockPosition(bukkitBedLocation);
 		Packet entityDestroy = new PacketPlayOutEntityDestroy(id);
 
-		ScoreboardTeam team = new ScoreboardTeam(minecraftServer.getScoreboard(), "SimpleLay_TEAM")
-				.setNameTagVisibility(ScoreboardTeam.EnumNameTagVisibility.NEVER);
+		ScoreboardTeam team = new ScoreboardTeam((Scoreboard) minecraftServer.getScoreboard(), "SimpleLay_TEAM");
+		//fixme		.setNameTagVisibility(ScoreboardTeam.EnumNameTagVisibility.NEVER);
 		Packet scoreboardTeam1 = new PacketPlayOutScoreboardTeam(team, 0), scoreboardTeam2 = new PacketPlayOutScoreboardTeam(team, Collections.singletonList(player.getName()), 3);
-
-        try {
-			this.fakePlayer.setPose(EntityPose.SLEEPING);
+		this.fakePlayer.setPose(EntityPose.SLEEPING);
+		this.fakePlayer.setBedPosition(nmsBedLocation);
+		try {
 			DataWatcher watcher = entityPlayer.getDataWatcher(), fakeWatcher = this.fakePlayer.getDataWatcher();
-		    fakeWatcher.set(DataWatcherRegistry.BYTE.createAccessor(16), watcher.get(DataWatcherRegistry.BYTE.createAccessor(16)));
-	        fakeWatcher.set(EntityLiving.SLEEPING_POS_ID, Optional.of(nmsBedLocation));
-			Packet entityMetadata = new PacketPlayOutEntityMetadata(this.fakePlayerID, fakeWatcher, false);
+		    Packet entityMetadata = new PacketPlayOutEntityMetadata(this.fakePlayerID, fakeWatcher, false);
 			player.hidePlayer(plugin, player);
 			for (Player onlinePlayer : player.getServer().getOnlinePlayers()) {
 				EntityPlayer entityPlayer1 = CraftPlayer.wrap(onlinePlayer).getHandle();
 				PlayerConnection playerConnection = entityPlayer1.getPlayerConnection();
+				playerConnection.sendPacket(namedEntitySpawn);
 				if (!entityPlayer1.equals(entityPlayer)) {
 					playerConnection.sendPacket(playerInfo);
 				}
@@ -91,11 +89,9 @@ public class LayPlayer_v1_14_R1 implements ILayPlayer {
         } catch (Exception e) {
         	e.printStackTrace();
         }
-        //player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 25122001, 244, true));
         final Location location = player.getLocation();
         this.rider = location.getWorld().spawn(location.clone().subtract(0, 1.7, 0), ArmorStand.class);
         this.rider.setGravity(false);
-        //rider.setMarker(true);
         this.rider.setVisible(false);
         this.rider.addPassenger(player);
         this.plugin.setLay(this.getPlayer().getUniqueId(), this);
@@ -109,7 +105,7 @@ public class LayPlayer_v1_14_R1 implements ILayPlayer {
 	    watcher.set(DataWatcherRegistry.BYTE.createAccessor(16), watcher.get(DataWatcherRegistry.BYTE.createAccessor(16)));
 		Packet entityMetadata = new PacketPlayOutEntityMetadata(entityPlayer.getId(), watcher, true);
 		Packet entityHeadRotation = new PacketPlayOutEntityHeadRotation(entityPlayer, (byte) NumberConversions.floor(entityPlayer.getHeadRotation() * 256.0F / 360.0F));
-		Packet[] equipmentPackets = ILayPlayer.getEquipmentPackets(player);
+		Packet[] equipmentPackets = ILayPlayer.getEquipmentPackets(player, fakePlayerID);
 		MobEffect ppl = entityPlayer.getEffect(MobEffects.INVISIBILITY);
 		this.player.showPlayer(plugin, player);
 		entityPlayer.getPlayerConnection().sendPacket(new PacketPlayOutRemoveEntityEffect(entityPlayer.getId(), MobEffects.INVISIBILITY));
@@ -184,7 +180,7 @@ public class LayPlayer_v1_14_R1 implements ILayPlayer {
 		plugin.getServer().getOnlinePlayers().stream().map(CraftPlayer::wrap).map(CraftPlayer::getHandle).forEach(entityPlayer -> plugin.getLayingPlayers().values().forEach(iLayPlayer -> {
 			EntityPlayer p = CraftPlayer.wrap(iLayPlayer.getPlayer()).getHandle();
 			PlayerConnection playerConnection = entityPlayer.getPlayerConnection();
-			playerConnection.sendPacket(ILayPlayer.getEquipmentPackets(p));
+			playerConnection.sendPacket(ILayPlayer.getEquipmentPackets(p, iLayPlayer.getFakePlayerID()));
 			Location loc = iLayPlayer.getPlayer().getLocation();
 			loc.setY(0);
 			entityPlayer.getBukkitEntity().sendBlockChange(loc, iLayPlayer.bedBlockData());

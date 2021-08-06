@@ -21,7 +21,12 @@ public class CraftServer extends AbstractWrapper {
     }
 
     public MinecraftServer getServer() {
-        return MinecraftServer.wrap(getTypedMethod("getHandle", MinecraftServer.clazz).invoke(instance));
+        //org.bukkit.craftbukkit.v1_17_R1.CraftServer;
+        try { //for 1.14 +
+            return MinecraftServer.wrap(getTypedMethod("getServer", DedicatedServer.clazz).invoke(instance));
+        } catch (Exception e) { //for 1.13 +
+            return MinecraftServer.wrap(getTypedMethod("getServer", MinecraftServer.clazz).invoke(instance));
+        }
     }
 
 }

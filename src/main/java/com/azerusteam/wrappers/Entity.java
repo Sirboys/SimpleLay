@@ -1,13 +1,12 @@
 package com.azerusteam.wrappers;
 
 import com.comphenix.tinyprotocol.Reflection;
-import com.mojang.authlib.GameProfile;
 
 import java.util.Objects;
 
 public abstract class Entity extends AbstractWrapper {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("Entity");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("Entity", "net.minecraft.world.entity");
 
     Object instance;
 
@@ -36,7 +35,7 @@ public abstract class Entity extends AbstractWrapper {
     }
 
     public void setPose(EntityPose pose) {
-        getMethod("setPose", EntityPose.clazz);
+        getMethod("setPose", EntityPose.clazz).invoke(instance, pose.instance);
     }
 
     @Override

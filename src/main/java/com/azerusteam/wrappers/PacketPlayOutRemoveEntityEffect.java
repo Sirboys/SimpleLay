@@ -4,7 +4,7 @@ import com.comphenix.tinyprotocol.Reflection;
 
 public class PacketPlayOutRemoveEntityEffect extends Packet {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("PacketPlayOutEntityDestroy");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("PacketPlayOutRemoveEntityEffect", "net.minecraft.network.protocol.game");
 
     public PacketPlayOutRemoveEntityEffect(int entityID, MobEffectList mobEffect) {
         instance = getConstructor(int.class, MobEffectList.clazz).invoke(entityID, mobEffect.instance);

@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public class DataWatcher extends AbstractWrapper {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("DataWatcher");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("DataWatcher", "net.minecraft.network.syncher");
 
     protected final Object instance;
 
@@ -43,12 +43,13 @@ public class DataWatcher extends AbstractWrapper {
             }
         }
         // original nms value is passed to the method
-        getMethod("set", DataWatcherObject.clazz, Object.class).invoke(instance, accessor, val);
+        getMethod("set", DataWatcherObject.clazz, Object.class).invoke(clazz.cast(instance), DataWatcherObject.clazz.cast(accessor.instance), val);
     }
 
     @SuppressWarnings("unchecked")
     public <T> T get(DataWatcherObject<T> accessor) {
-        return (T) getMethod("get", DataWatcherObject.clazz).invoke(instance, accessor);
+
+        return (T) getMethod("get", DataWatcherObject.clazz).invoke(clazz.cast(instance), DataWatcherObject.clazz.cast(accessor.instance));
     }
 
     public static <T> DataWatcherObject<T> defineId(Class<?> entityClass, DataWatcherSerializer<T> serializer) {

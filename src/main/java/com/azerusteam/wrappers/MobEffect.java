@@ -1,10 +1,11 @@
 package com.azerusteam.wrappers;
 
 import com.comphenix.tinyprotocol.Reflection;
+import org.jetbrains.annotations.Nullable;
 
 public class MobEffect extends AbstractWrapper {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("MobEffect");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("MobEffect", "net.minecraft.world.effect");
 
     protected final Object instance;
 
@@ -21,7 +22,9 @@ public class MobEffect extends AbstractWrapper {
         instance = handle;
     }
 
+    @Nullable
     public static MobEffect wrap(Object handle) {
+        if (handle == null) return null;
         if (clazz.isInstance(handle))
             return new MobEffect(handle);
         else

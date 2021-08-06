@@ -1,15 +1,14 @@
 package com.azerusteam.wrappers;
 
 import com.comphenix.tinyprotocol.Reflection;
-import com.mojang.authlib.GameProfile;
 
 public class WorldServer extends World {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("WorldServer");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("WorldServer", "net.minecraft.server.level");
 
     protected final Object instance;
 
-    private WorldServer(Object handle) {
+    protected WorldServer(Object handle) {
         instance = handle;
     }
 

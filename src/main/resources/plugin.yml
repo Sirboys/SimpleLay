@@ -1,9 +1,9 @@
-main: ru.azerusteam.sirmanager.Main
+main: com.azerusteam.sirmanager.SimpleLay
 name: SimpleLay
 version: 1.1.0
 authors: [Sirboys, l_MrBoom_l]
 prefix: SimpleLay
-api-version: 1.17
+api-version: 1.13
 commands: 
   sit:
     description: 'Sit on any block!'

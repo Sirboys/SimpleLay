@@ -4,11 +4,14 @@ import com.comphenix.tinyprotocol.Reflection;
 
 public class ScoreboardTeam extends AbstractWrapper {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("ScoreboardTeam");
-    public static final Class<?> enumClazz = Reflection.getMinecraftClass("ScoreboardTeamBase$EnumNameTagVisibility");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("ScoreboardTeam", "net.minecraft.world.scores");
+    public static final Class<?> enumClazz = Reflection.getMinecraftClass("ScoreboardTeamBase$EnumNameTagVisibility", "net.minecraft.world.scores");
 
-    protected final Object instance;
+    protected Object instance;
 
+    public ScoreboardTeam(Scoreboard scoreboard, String name) {
+        instance = getConstructor(Scoreboard.clazz, String.class).invoke(scoreboard.instance, name);
+    }
     public ScoreboardTeam(ScoreboardServer scoreboardServer, String name) {
         instance = getConstructor(ScoreboardServer.clazz, String.class).invoke(scoreboardServer.instance, name);
     }
@@ -25,7 +28,7 @@ public class ScoreboardTeam extends AbstractWrapper {
     }
 
     public ScoreboardTeam setNameTagVisibility(EnumNameTagVisibility visibility) {
-        getMethod("setNameTagVisibility", enumClazz).invoke(visibility.instance);
+        getMethod("setNameTagVisibility", enumClazz).invoke(this.instance, visibility.instance);
         return this;
     }
 

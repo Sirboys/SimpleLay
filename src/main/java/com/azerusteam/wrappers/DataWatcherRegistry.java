@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public class DataWatcherRegistry extends AbstractWrapper {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("DataWatcherRegistry");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("DataWatcherRegistry", "net.minecraft.network.syncher");
     protected final Object instance;
 
     public static final DataWatcherSerializer<Byte> BYTE = DataWatcherSerializer.wrap(Reflection.getField(clazz, "a", DataWatcherSerializer.clazz).get(null));

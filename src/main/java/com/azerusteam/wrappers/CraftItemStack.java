@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class CraftItemStack extends AbstractWrapper {
 
-    public static final Class<?> clazz = Reflection.getCraftBukkitClass("CraftItemStack");
+    public static final Class<?> clazz = Reflection.getCraftBukkitClass("inventory.CraftItemStack");
     Object instance;
 
     private CraftItemStack(Object handle) {
@@ -30,7 +30,9 @@ public class CraftItemStack extends AbstractWrapper {
     }
 
     public static ItemStack asNMSCopy(org.bukkit.inventory.ItemStack original) {
-        return ItemStack.wrap(Reflection.getTypedMethod(clazz, "asNMSCopy", ItemStack.clazz, org.bukkit.inventory.ItemStack.class).invoke(null, original));
+        return ItemStack.wrap(Reflection.getTypedMethod(clazz, "asNMSCopy",
+                ItemStack.clazz, org.bukkit.inventory.ItemStack.class)
+                .invoke(null, original));
     }
 
 }

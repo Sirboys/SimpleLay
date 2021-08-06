@@ -4,8 +4,10 @@ import com.comphenix.tinyprotocol.Reflection;
 
 public class MobEffectList extends AbstractWrapper {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("MobEffectList");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("MobEffectList", "net.minecraft.world.effect");
     protected final Object instance;
+
+    //public static final MobEffectList INVISIBILITY = MobEffectList.wrap(Reflection.getField(clazz, "INVISIBILITY", MobEffectList.clazz));
 
     private MobEffectList(Object handle) {
         instance = handle;

@@ -2,13 +2,14 @@ package com.azerusteam.wrappers;
 
 import com.comphenix.tinyprotocol.Reflection;
 
-public class ScoreboardServer extends AbstractWrapper {
+public class ScoreboardServer extends Scoreboard {
 
-    public static final Class<?> clazz = Reflection.getMinecraftClass("ScoreboardServer");
+    public static final Class<?> clazz = Reflection.getMinecraftClass("ScoreboardServer", "net.minecraft.server");
 
     protected final Object instance;
 
     private ScoreboardServer(Object handle) {
+        super();
         instance = handle;
     }
 

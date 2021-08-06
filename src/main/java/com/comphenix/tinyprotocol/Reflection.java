@@ -138,7 +138,24 @@ public final class Reflection {
 	public static Class<?> getMinecraftClass(String name) {
 		return getCanonicalClass(NMS_PREFIX + "." + name);
 	}
-
+	public static Class<?> getMinecraftClass(String name, String pack) {
+		try {
+			return getMinecraftClass(name);
+		} catch (Exception e) {
+			return getCanonicalClass(pack + "." + name);
+		}
+	}
+	public static Class<?> getArrayOfMinecraftClass(String name) {
+		return getCanonicalClass("[L" + NMS_PREFIX + "." + name + ";");
+	}
+	//fixme
+	public static Class<?> getArrayOfMinecraftClass(String name, String pack) {
+		try {
+			return getCanonicalClass("[L" + NMS_PREFIX + "." + name + ";");
+		} catch (Exception e) {
+			return getCanonicalClass("[L" + pack + "." + name + ";");
+		}
+	}
 	public static Class<?> getCraftBukkitClass(String name) {
 		return getCanonicalClass(OBC_PREFIX + "." + name);
 	}
